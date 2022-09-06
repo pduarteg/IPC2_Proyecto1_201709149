@@ -10,7 +10,7 @@ class Matriz:
 		self.filas = R
 
 	def crear_matriz(self):
-		#print("Columnas: " + str(self.columnas) + ", filas: " + str(self.filas))
+		# print("Columnas: " + str(self.columnas) + ", filas: " + str(self.filas))
 		t = self.raiz
 
 		for i in range(self.columnas):
@@ -33,7 +33,7 @@ class Matriz:
 			superior = t
 
 			for j in range(self.filas):
-				nuevo = Nodo.Nodo(None, None, None, None, True, i+1, j+1)
+				nuevo = Nodo.Nodo(None, None, None, None, False, i+1, j+1)
 
 				while aux.derecha != None:
 					aux = aux.derecha
@@ -49,38 +49,6 @@ class Matriz:
 				n+=1
 				#print("Nodo no:"  + str(n))
 
-	def llenar_matriz(self, cadena):
-		cadena = cadena.rstrip()
-		cadena = cadena.lstrip()
-
-		t = self.raiz
-		aux = t
-		x = 1
-		y = 1
-		n = 0
-
-		for z in cadena:			
-
-			# Disminuye la columna
-			while n < y:
-				aux = aux.abajo
-				n += 1
-
-			nodo = aux
-
-			for i in range(x):
-				nodo = nodo.derecha
-
-			nodo.dato = z
-			#print("dato agregado en: (" + str(x) + ", " + str(y) + ")")
-			
-			# Aumenta la columna solo si se está al final de la fila
-			if x == self.columnas:
-				y += 1
-				x = 1
-			else:
-				x += 1
-
 	def imprimir_matriz(self):
 		t = self.raiz
 		for i in range(self.filas):
@@ -88,36 +56,44 @@ class Matriz:
 			aux = t
 			for j in range(self.columnas):
 				aux = aux.derecha
-				if aux.dato != None and j == 0:
-					print("       [" + aux.dato + "]", end="")
-				elif aux.dato != None:
-					print("[" + aux.dato + "]", end="")
+				estado_de_celula = ""
+
+				if aux.estado:
+					estado_de_celula = "1"
+				else:
+					estado_de_celula = "0"
+
+				if j == 0:
+					print("       [" + estado_de_celula + "]", end="")
+				else:
+					print("[" + estado_de_celula + "]", end="")
 			print(" ")
 
-	def buscar_por_coordenada(self, x , y):
+	# Método que establece el estado sano o infectado de una celda por sus coordenadas
+	def establecer_por_coordenada(self, x , y, estado):
 		t = self.raiz
 		t = t.abajo
 		t = t.derecha
 		nodo = None
 		encontrado = False
 
-		print("buscando (" + str(x) + ", " + str(y) + ")")
+		#print("buscando (" + str(x) + ", " + str(y) + ")")
 
 		for j in range(self.columnas):
 			if t.x == x:
 				for i in range(self.filas):
 					if t.y == y:
 						nodo = t
-						print("Encontrado!")
-						print("con dato: " + str(nodo.dato))
+						#print("Encontrado!")
+						nodo.set_estado(estado)
 						break
 					else:
 						t = t.abajo
-						print(" MOVIENDO A ABAJO ")
+						# print(" MOVIENDO A ABAJO ")
 				break
 			else:
 				t = t.derecha
-				print(" MOVIENDO A DERECHA ")
+				# print(" MOVIENDO A DERECHA ")
 
 		if encontrado:
 			return nodo

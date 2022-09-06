@@ -7,8 +7,8 @@ class Paciente:
 	period = 0
 	m = 0
 
-	matriz_inicial = None
-	matriz_final = None
+	rejilla_inicial = None
+	rejilla_final = None
 
 	def __init__(self, name, age, period, m):
 		self.name = name
@@ -19,9 +19,8 @@ class Paciente:
 	def crear_matriz_inicial(self):
 		nueva_matriz = Matriz.Matriz(self.m, self.m)
 		nueva_matriz.crear_matriz()
-		nueva_matriz.llenar_matriz(self.patI)
 		# nueva_matriz.imprimir_matriz()
-		self.matriz_inicial = nueva_matriz
+		self.rejilla_inicial = nueva_matriz
 
 	def imprimir_datos_de_paciente(self):
 		print("---------------------------------------------------------------------")
@@ -29,6 +28,8 @@ class Paciente:
 		print("Edad: " + self.age)
 		print("Dimensión:" + str(self.m) + " x " + str(self.m))
 		print("Periodos: " + str(self.period))
+		print("Rejilla: ")
+		self.rejilla_inicial.imprimir_matriz()
 		print("---------------------------------------------------------------------")
 
 	def crear_matriz_final(self, silencioso):

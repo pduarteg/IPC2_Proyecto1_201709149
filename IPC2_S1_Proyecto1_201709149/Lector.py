@@ -74,11 +74,26 @@ class Lector:
                         continue
                    
                     period = lista_de_pacientes[i].getElementsByTagName("periodos")[0].childNodes[0].data
-                    m = lista_de_pacientes[i].getElementsByTagName("m")[0].childNodes[0].data
+                    m = int(lista_de_pacientes[i].getElementsByTagName("m")[0].childNodes[0].data)
 
                     # Recoleección de datos de celdas para el i-ésimo paciente desde aquí:
 
                     nuevo_paciente = Paciente.Paciente(name, age, period, m)
+                    nuevo_paciente.crear_matriz_inicial()
+
+                    rejilla = lista_de_pacientes[i].getElementsByTagName("rejilla")[0]
+                    celdas = rejilla.getElementsByTagName("celda")
+
+                    # Ciclo para indicar las células infectadas
+
+                    for c_cell in celdas:
+                        inf_cell_y = int(c_cell.attributes["f"].value)
+                        inf_cell_x = int(c_cell.attributes["c"].value)
+                        print("     Célula infectada en coordenada: (" + str(inf_cell_x) + ", " + str(inf_cell_y) + ")")
+                        nuevo_paciente.rejilla_inicial.establecer_por_coordenada(inf_cell_x, inf_cell_y, True)
+
+                    nuevo_paciente.imprimir_datos_de_paciente()
+
                     self.lista_de_pacientes_procesados.agregar(nuevo_paciente)
 
                 print("")
