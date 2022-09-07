@@ -5,6 +5,9 @@ class Matriz:
 	columnas = 0
 	filas = 0
 
+	n = 0 # frecuencia de repetición del patrón inicial
+	n_1 = 0 # frecuencia de repetición de un patrón distinto del inicial
+
 	def __init__(self, C, R):
 		self.columnas = C
 		self.filas = R
@@ -64,7 +67,7 @@ class Matriz:
 					estado_de_celula = "0"
 
 				if j == 0:
-					print("       [" + estado_de_celula + "]", end="")
+					print("       	[" + estado_de_celula + "]", end="")
 				else:
 					print("[" + estado_de_celula + "]", end="")
 			print(" ")
@@ -102,3 +105,6 @@ class Matriz:
 
 	def get_primer_nodo(self):
 		return self.raiz.abajo.derecha
+
+	def establecer_periodo_de_recurrencia(self, n):
+		self.n = n

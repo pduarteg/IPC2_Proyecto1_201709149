@@ -39,3 +39,16 @@ class Lista_pacientes:
 				temp = temp.next
 
 		return r_paciente
+
+	def buscar_por_posicion(self, pos):
+		actual = self.first
+		for i in range(pos-1):
+			actual = actual.next
+		return actual
+
+	def diagnosticar_pacientes(self):
+		t = self.first
+
+		while t != None:
+			t.diagnosticar()
+			t = t.next

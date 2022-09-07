@@ -16,21 +16,21 @@ class Menu:
         self.exit = exit
 
     def imprimir_menu(self):
-        print(" ****************************************************************************")
-        print(" *                              MENÚ PRINCIPAL                              *")
-        print(" ****************************************************************************")
+        print(" ╔═══════════════════════════════════════════════════════════════════════════╗")
+        print(" ║                        M E N Ú   P R I N C I P A L                        ║")
+        print(" ╚═══════════════════════════════════════════════════════════════════════════╝")
         print("")
-        print("  [1] Cargar datos desde archivo")
-        print("  [2] Diagnosticar paciente")
-        print("  [3] Generar gráfica (patrón inicial)")
-        print("  [4] Generar gráfica (patrón final)")
-        print("  [5] Salir")
+        print("     [1]  Cargar datos desde archivo")
+        print("     [2]  Diagnosticar paciente")
+        print("     [3]  Generar gráfica (patrón inicial)")
+        print("     [4]  Generar gráfica (patrón final)")
+        print("     [5]  Salir")
         print("")
-        print("Escriba el número de acuerdo a la opción que desee: ")
+        print(" Escriba el número de acuerdo a la opción que desee: ")
 
     def imprimir_menu_de_carga(self):
         print("")
-        print("---------------- Carga de archivos: ----------------")
+        print(" ---------------- Carga de archivos: ----------------")
         print("")
         print(" [1] Escribir dirección")
         print(" [2] Seleccionar archivo")
@@ -40,25 +40,43 @@ class Menu:
 
  
     def mostrar_pacientes_disponibles(self, modo):
-        n = 1
-        temp = self.lector_obj.lista_de_pacientes_procesados.first
+        while True:
+            n = 1
+            temp = self.lector_obj.lista_de_pacientes_procesados.first
 
-        print("")
-        print("pacientes disponibles: ")
-        print("")
-        while temp != None:
-            print(" [" + str(n) + "] " + temp.name)
-            temp = temp.next
-            n += 1
-        
-        if modo == "b":
-            print(" [" + str(n) + "] Todos (Estructura de entrada)")            
+            print("")
+            
+            while temp != None:
+                print(" [" + str(n) + "] " + temp.name)
+                temp = temp.next
+                n += 1
+            
+            if modo == "b":
+                print(" [" + str(n) + "] Todos (Estructura de entrada)")
+                print(" [" + str(n+1) + "] Cancelar")
 
-        print("")
-        if modo == "a":
-            print("Escriba el nombre del paciente que desee calcular la ruta:")
-        elif modo == "b":
-            print("Escriba el nombre del paciente a graficar, o 'Todos' para estructura de entrada.")
+            print("")
+            if modo == "a":
+                print("Escriba el número correspondiente al paciente que desee diagnosticar:")
+            elif modo == "b":
+                print("Escriba el número correspondiente al paciente que desee diagnosticar, o 'Todos' para la estructura de entrada.")
+
+                p_option = 0
+                try:
+                    p_option = int(input())
+                except:
+                    print("Opción no válida, ingrese un número.")
+                    continue
+
+                total_patients = self.lector_obj.lista_de_pacientes_procesados.cant
+                if p_option <= total_patients:
+                    p_selected = self.lector_obj.lista_de_pacientes_procesados.buscar_por_posicion(p_option)
+                    print("Se diagnosticará al paciente: " + p_selected.name)
+                elif p_option == total_patients + 1:
+                    print("Diagnosticar todos")
+                elif p_option == total_patients + 2:
+                    print("")
+                    break
 
     def iniciar_menu(self):
         print("")
@@ -98,7 +116,7 @@ class Menu:
                                 print("Carga realizada exitosamente.")
                                 print("")
                                 self.lector_obj.read_done = True
-                                self.lector_obj.proces_file()
+                                self.lector_obj.proces_file()                                
                                 back = True
                     elif selected_option_l == 2:
                         if self.lector_obj.read_done:
@@ -112,8 +130,9 @@ class Menu:
                                 print("Carga realizada exitosamente.")
                                 print("")
                                 self.lector_obj.read_done = True
-                                self.lector_obj.proces_file()
+                                self.lector_obj.proces_file()                                
                                 back = True
+
                     elif selected_option_l == 3:
                         print("Regresando al menú principal.")
                         print("")
@@ -123,7 +142,19 @@ class Menu:
                         print("")                
             elif selected_option == 2:
                 print("")
-                print("---------------- Clientes disponibles ----------------")
+                lista = self.lector_obj.lista_de_pacientes_procesados
+                sin_pacientes = False
+                if lista != None:
+                    if lista.first != None:
+                        print("---------------- Pacientes disponibles ----------------")
+                        todos = self.mostrar_pacientes_disponibles("b")
+                    else:
+                        sin_pacientes = True
+                else:
+                    sin_pacientes = True
+                if sin_pacientes:
+                    print(" (!) No se encuentran pacientes disponibles actualmente.")
+                    print("")
             elif selected_option == 3:
                 print("Se leerán los datos del archivo cargado...")
                 if self.lector_obj.read_done:

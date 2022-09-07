@@ -21,7 +21,7 @@ class Lector:
         try:
             root = Tk()
             root.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
-                filetypes=(("Input Files [IPC2]", "*.xml"), ("all files", "*.*")))            
+                filetypes=(("XML Input Files [IPC2]", "*.xml"), ("all files", "*.*")))            
             self.file_root = root.filename            
         except:
             print("Error de directorio")
@@ -69,12 +69,24 @@ class Lector:
                         age = personal_data.getElementsByTagName("edad")[0].childNodes[0].data
                         print("     Paciente encontrado con nombre: " + name + ", edad: " + age)
                     except:                        
-                        print("No se han encontrado los atributos requerridos para el paciente. ")
-                        print("El paciente será omitido.")
+                        print("     No se han encontrado los atributos requerridos para el paciente. ")
+                        print("     El paciente será omitido.")
                         continue
                    
-                    period = lista_de_pacientes[i].getElementsByTagName("periodos")[0].childNodes[0].data
+                    period = int(lista_de_pacientes[i].getElementsByTagName("periodos")[0].childNodes[0].data)
                     m = int(lista_de_pacientes[i].getElementsByTagName("m")[0].childNodes[0].data)
+
+                    try:
+                        if period >= 1 and m % 10 == 0:
+                            print("     Procesando información de rejilla...")
+                        else:
+                            print("     Los datos de dimensiones o periodos no son válidos.")
+                            print("     El paciente será omitido.")
+                            continue
+                    except:
+                        print("     Se han encontrado datos errones.")
+                        print("     El paciente será omitido.")
+                        continue
 
                     # Recoleección de datos de celdas para el i-ésimo paciente desde aquí:
 
@@ -93,13 +105,11 @@ class Lector:
                         nuevo_paciente.rejilla_inicial.establecer_por_coordenada(inf_cell_x, inf_cell_y, True)
 
                     nuevo_paciente.imprimir_datos_de_paciente()
-
                     self.lista_de_pacientes_procesados.agregar(nuevo_paciente)
 
                 print("")
-                print("Información de teerrenos procesada correctamente.")
+                print("Información de pacientes procesada correctamente.")
                 print("")
-
             else:
                 print("")
                 print("No se han encontrado pacientes.")

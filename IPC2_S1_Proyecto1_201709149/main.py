@@ -4,5 +4,7 @@
 import Menu as MenuClass
 
 menu_obj = MenuClass.Menu(False)
-menu_obj.iniciar_menu()
 
+print("")
+print("	    ¯¨'*•~-.¸¸,.-~*'[ IPC 2 - Proyecto 1 ]¯¨'*•~-.¸¸,.-~*'")
+menu_obj.iniciar_menu()
