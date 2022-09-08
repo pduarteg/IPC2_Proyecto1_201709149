@@ -4,6 +4,7 @@ from xml.dom import minidom
 
 import Lista_pacientes
 import Paciente
+import Matriz
 
 class Lector:
 
@@ -63,7 +64,6 @@ class Lector:
                     print("     Verificando datos iniciales...")
 
                     try:
-                        # lista_de_pacientes[i].attributes["nombre"].value
                         personal_data = lista_de_pacientes[i].getElementsByTagName("datospersonales")[0]
                         name = personal_data.getElementsByTagName("nombre")[0].childNodes[0].data
                         age = personal_data.getElementsByTagName("edad")[0].childNodes[0].data
@@ -77,7 +77,7 @@ class Lector:
                     m = int(lista_de_pacientes[i].getElementsByTagName("m")[0].childNodes[0].data)
 
                     try:
-                        if period >= 1 and m % 10 == 0:
+                        if period >= 1 and m % 10 == 0 and m <= 10000 and period <= 10000:
                             print("     Procesando información de rejilla...")
                         else:
                             print("     Los datos de dimensiones o periodos no son válidos.")
@@ -91,7 +91,7 @@ class Lector:
                     # Recoleección de datos de celdas para el i-ésimo paciente desde aquí:
 
                     nuevo_paciente = Paciente.Paciente(name, age, period, m)
-                    nuevo_paciente.crear_matriz_inicial()
+                    rejilla_inicial = Matriz.Matriz(m, m)
 
                     rejilla = lista_de_pacientes[i].getElementsByTagName("rejilla")[0]
                     celdas = rejilla.getElementsByTagName("celda")
@@ -101,13 +101,16 @@ class Lector:
                     for c_cell in celdas:
                         inf_cell_y = int(c_cell.attributes["f"].value)
                         inf_cell_x = int(c_cell.attributes["c"].value)
-                        print("     Célula infectada en coordenada: (" + str(inf_cell_x) + ", " + str(inf_cell_y) + ")")
-                        nuevo_paciente.rejilla_inicial.establecer_por_coordenada(inf_cell_x, inf_cell_y, True)
+                        #print("     Célula infectada en coordenada: (" + str(inf_cell_x) + ", " + str(inf_cell_y) + ")")
+                        rejilla_inicial.establecer_por_coordenada(inf_cell_x, inf_cell_y, True)
 
-                    nuevo_paciente.imprimir_datos_de_paciente()
+                    # Asigna la rejilla al nuevo paciente
+                    nuevo_paciente.rejilla_inicial = rejilla_inicial
+                    # Agrega el nuevo paciente a la lista
                     self.lista_de_pacientes_procesados.agregar(nuevo_paciente)
-
+                    
                 print("")
+                self.procesed_data = True
                 print("Información de pacientes procesada correctamente.")
                 print("")
             else:

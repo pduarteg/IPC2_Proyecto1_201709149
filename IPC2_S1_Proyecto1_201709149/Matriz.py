@@ -1,28 +1,31 @@
 import Nodo
 
 class Matriz:
-	raiz = Nodo.Nodo(None, None, None, None, False, 0, 0)
+	raiz = None
 	columnas = 0
 	filas = 0
 
 	n = 0 # frecuencia de repetición del patrón inicial
 	n_1 = 0 # frecuencia de repetición de un patrón distinto del inicial
 
+	next = None
 	def __init__(self, C, R):
+		self.raiz = Nodo.Nodo(None, None, None, None, 0, 0)
 		self.columnas = C
 		self.filas = R
+		self.crear_matriz()
 
 	def crear_matriz(self):
 		# print("Columnas: " + str(self.columnas) + ", filas: " + str(self.filas))
 		t = self.raiz
 
 		for i in range(self.columnas):
-			t.derecha = Nodo.Nodo(None, None, None, None, False, i+1, 0)
+			t.derecha = Nodo.Nodo(None, None, None, None, i+1, 0)
 			t = t.derecha
 
 		t = self.raiz
 		for j in range(self.filas):
-			t.abajo = Nodo.Nodo(None, None, None, None, False, 0, j+1)
+			t.abajo = Nodo.Nodo(None, None, None, None, 0, j+1)
 			t = t.abajo
 
 		# Crear columna vacía y enlazar
@@ -36,7 +39,7 @@ class Matriz:
 			superior = t
 
 			for j in range(self.filas):
-				nuevo = Nodo.Nodo(None, None, None, None, False, i+1, j+1)
+				nuevo = Nodo.Nodo(None, None, None, None, i+1, j+1)
 
 				while aux.derecha != None:
 					aux = aux.derecha
@@ -108,3 +111,17 @@ class Matriz:
 
 	def establecer_periodo_de_recurrencia(self, n):
 		self.n = n
+
+	def contar_sanas(self):
+		sanas = 0
+
+		t = self.raiz
+		for i in range(self.filas):
+			t = t.abajo
+			aux = t
+			for j in range(self.columnas):
+				aux = aux.derecha
+				
+				if aux.estado == False:
+					sanas += 1
+		return sanas

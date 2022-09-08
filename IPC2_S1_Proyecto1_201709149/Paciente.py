@@ -10,18 +10,21 @@ class Paciente:
 	caso_de_enfermedad = ""
 
 	rejilla_inicial = None
-	lista_de_patrones = Patrones.Patrones()
-	
+	lista_de_patrones = None
+	lista_recorrido = None
 
+	n_1 = None
+	
 	def __init__(self, name, age, period, m):
 		self.name = name
 		self.age = age
 		self.period = period
 		self.m = m
+		self.lista_de_patrones = Patrones.Patrones()
+		self.lista_recorrido = Patrones.Patrones()
 
 	def crear_matriz_inicial(self):
 		nueva_matriz = Matriz.Matriz(self.m, self.m)
-		nueva_matriz.crear_matriz()
 		# nueva_matriz.imprimir_matriz()
 		self.rejilla_inicial = nueva_matriz
 
@@ -32,36 +35,92 @@ class Paciente:
 		print("Dimensión:" + str(self.m) + " x " + str(self.m))
 		print("Periodos: " + str(self.period))
 		print("Rejilla: ")
-		self.rejilla_inicial.imprimir_matriz()
+		rejilla = self.rejilla_inicial
+		if rejilla != None:
+			sanas = rejilla.contar_sanas()
+			infectadas = self.m*self.m - sanas
+			print("	Células sanas: " + str(sanas))
+			print("	Células infectadas: " + str(infectadas))
+			print("")
+			rejilla.imprimir_matriz()
+		else:
+			print("Sin rejilla cargada")
 		print("---------------------------------------------------------------------")
 
-	def diagnosticar(self, m_muestra):
-		matriz_diagnostico = Matriz.Matriz(self.m, self.m)
-		cell_o = m_muestra
-		cell_n = matriz_diagnostico.raiz
+	# Si inicial es verdadero, se verifica el patron inicial y agregan nuevos patrones encontrados
+	# a la lista de patrones. Si inicial es falso, no se agregan nuevos patrones.
+	# Si silencioso es verdadero, se omiten las impresiones de retroalimentación, se genera una lista
+	# con todos los patrones y no se detiene hasta cumplir con la cantidad de periodos.
+	def diagnosticar(self, m_muestra, inicial, silencioso):
+		self.lista_recorrido = Patrones.Patrones()
 
-		# Creación de copia de la rejilla inicial
+		if silencioso == False:
+			print("	Se ha iniciado un diagnóstico...")
+		else:
+			self.lista_recorrido.agregar(m_muestra)
+		# Creación de copia de la rejilla inicial		
+		matriz_diagnostico = self.crear_copia_de_patron(m_muestra)
+
+		# Aplicación de los cambios k veces para N_per periodos de repetición del estado
+		p = self.period
+		N_per = 0 # Número de periodo actual
+		N_rep = 0 # Número de periodos de repetición (frecuencia)
+
+		for k in range(p):
+			self.indentificar_futuros_cambios(matriz_diagnostico)
+			self.aplicar_cambios_a_celulas(matriz_diagnostico)
+
+			if silencioso:
+				self.lista_recorrido.agregar(self.crear_copia_de_patron(matriz_diagnostico))
+			N_per += 1
+
+			if silencioso == False:
+				# Información de rejilla actual
+				print("	Estado de la rejilla tras " + str(N_per) + " periodo(s):")			
+				sanas = matriz_diagnostico.contar_sanas()
+				infectadas = self.m*self.m-sanas
+				print("	Células sanas: " + str(sanas))
+				print("	Células infectadas: " + str(infectadas))
+				print("")
+				matriz_diagnostico.imprimir_matriz()
+				print("")
+				print("")
+
+			if self.comparar_rejillas(m_muestra, matriz_diagnostico):
+				m_muestra.establecer_periodo_de_recurrencia(N_per)
+				print("")
+				if silencioso == False:
+					print("Se ha encontrado una repetición del patrón en N = " + str(N_per))
+
+				N_rep = N_per
+				if N_rep == 1 and silencioso == False:
+					#print("Se ha identificado un caso mortal.")
+					break
+			elif inicial == False:
+				self.lista_de_patrones.agregar(self.crear_copia_de_patron(matriz_diagnostico))
+
+		return N_rep
+
+	def crear_copia_de_patron(self, muestra):
+		patron_copiado = Matriz.Matriz(self.m, self.m)
+
+		cell_o = muestra.raiz
+		cell_n = patron_copiado.raiz
+
 		for i in range(self.m):
 			cell_o = cell_o.abajo
 			cell_n = cell_n.abajo
 
-			for j in range(self.m):
-				cell_o = cell_o.derecha
-				cell_n = cell_n.derecha
-				if cell_o.estado == True:
-					cell_n.set_estado(True)
+			aux_o = cell_o
+			aux_n = cell_n
+			
+			for j in range(self.m):				
+				aux_o = aux_o.derecha
+				aux_n = aux_n.derecha
+				if aux_o.estado == True:
+					aux_n.set_estado(True)
 
-		# Aplicación de los cambios k veces para N_per periodos de repetición del estado
-		p = self.period
-		N_per = 0
-		for k in range(p):
-			self.indentificar_futuros_cambios(matriz_diagnostico)
-			self.aplicar_cambios_a_celulas(matriz_diagnostico)
-			N_per += 1
-			if comparar_rejillas(m_muestra, matriz_diagnostico):
-				m_muestra.establecer_periodo_de_recurrencia(N_per)
-				print("Se ha encontrado una repetición del patrón en N = " + str(N))
-				break
+		return patron_copiado
 
 	def comparar_rejillas(self, A, B):
 		simetry = True
@@ -70,15 +129,19 @@ class Paciente:
 
 		for i in range(self.m):
 			if simetry:
-				A = A.abajo
-				B = B.abajo
+				node_A = node_A.abajo
+				node_B = node_B.abajo
+
+				node_A_aux = node_A
+				node_B_aux = node_B
 			else:
 				break
 
+
 			for j in range(self.m):
-				A = A.derecha
-				B = B.derecha
-				if A.estado != B.estado:
+				node_A_aux = node_A_aux.derecha
+				node_B_aux = node_B_aux.derecha
+				if node_A_aux.estado != node_B_aux.estado:
 					simetry = False
 					break
 		return simetry
@@ -88,25 +151,51 @@ class Paciente:
 
 		for i in range(self.m):
 			cell = cell.abajo
-
+			cell_aux = cell
 			for j in range(self.m):
-				cell = cell.derecha
-				ady_inf = cell.verificar_vecinos()
+				cell_aux = cell_aux.derecha
+				ady_inf = cell_aux.verificar_vecinos()
+				#print("Celda (" + str(i+1) + ", " + str(j+1) + ") tiene " + str(ady_inf) + " vecinos")
 
 				# Caso de célula (sana o contagiada)
-				if cell.estado == False: # célula sana
+				if cell_aux.estado == False: # célula sana
 					if ady_inf == 3:
-						cell.set_cambiar(True)
-				elif cell.estado == True: # célula infectada
+						cell_aux.set_cambiar(True)
+				elif cell_aux.estado == True: # célula infectada
 					if ady_inf == 1 or ady_inf == 4:
-						cell.set_cambiar(True)
+						cell_aux.set_cambiar(True)
 
 	def aplicar_cambios_a_celulas(self, matrix):
 		cell = matrix.raiz
 
 		for i in range(self.m):
 			cell = cell.abajo
+			cell_aux = cell
 			for j in range(self.m):
-				cell = cell.derecha
-				if cell.cambiar:
-					cell.realizar_cambio()
+				cell_aux = cell_aux.derecha
+				if cell_aux.cambiar:
+					cell_aux.realizar_cambio()
+
+	def diagnosticar_lista_de_patrones(self):
+		first = self.lista_de_patrones.first
+		
+		# Almacena un periodo N_1 en caso de encontrarse repeticiones.
+		# Establece siempre el menor N_1 posible.
+		
+		menor_n1 = None
+		menor_aux = 0
+
+		while first != None:
+			menor_aux = self.diagnosticar(first, False, False)
+
+			if menor_aux == 1:
+				menor_n1 = 1
+				break
+			elif menor_n1 == None and menor_aux != 0:
+				menor_n1 = menor_aux
+			elif menor_n1 != None:
+				if menor_aux > 0 and menor_aux < menor_n1:
+					menor_n1 = menor_aux
+
+			self.n_1 = menor_n1
+		return menor_n1

@@ -20,11 +20,12 @@ class Menu:
         print(" ║                        M E N Ú   P R I N C I P A L                        ║")
         print(" ╚═══════════════════════════════════════════════════════════════════════════╝")
         print("")
-        print("     [1]  Cargar datos desde archivo")
-        print("     [2]  Diagnosticar paciente")
-        print("     [3]  Generar gráfica (patrón inicial)")
-        print("     [4]  Generar gráfica (patrón final)")
-        print("     [5]  Salir")
+        print("     [1]  Cargar datos desde archivo.")
+        print("     [2]  Diagnosticar paciente.")
+        print("     [3]  Mostrar información de pacientes cargados.")
+        print("     [4]  Generar diagnóstico de salida (XML).")
+        print("     [5]  Generar gráficas de recorrido.")
+        print("     [6]  Salir.")
         print("")
         print(" Escriba el número de acuerdo a la opción que desee: ")
 
@@ -57,7 +58,23 @@ class Menu:
 
             print("")
             if modo == "a":
-                print("Escriba el número correspondiente al paciente que desee diagnosticar:")
+                print("Escriba el número correspondiente al paciente que desee graficar su recorrido:")                
+
+                p_option = 0
+                try:
+                    p_option = int(input())
+                except:
+                    print("Opción no válida, ingrese un número.")
+                    continue
+
+                total_patients = self.lector_obj.lista_de_pacientes_procesados.cant
+                if p_option <= total_patients:
+                    p_selected = self.lector_obj.lista_de_pacientes_procesados.buscar_por_posicion(p_option)
+                    print("Se graficará al siguiente paciente:")
+                    p_selected.imprimir_datos_de_paciente()
+                    print("")
+                    self.escritor_obj.graficar_secuencia(p_selected)
+                break
             elif modo == "b":
                 print("Escriba el número correspondiente al paciente que desee diagnosticar, o 'Todos' para la estructura de entrada.")
 
@@ -71,7 +88,42 @@ class Menu:
                 total_patients = self.lector_obj.lista_de_pacientes_procesados.cant
                 if p_option <= total_patients:
                     p_selected = self.lector_obj.lista_de_pacientes_procesados.buscar_por_posicion(p_option)
-                    print("Se diagnosticará al paciente: " + p_selected.name)
+                    print("Se diagnosticará al siguiente paciente:")
+                    p_selected.imprimir_datos_de_paciente()
+                    print("")
+
+                    n_case = p_selected.diagnosticar(p_selected.rejilla_inicial, True, False)
+
+                    # Verifica el tipo de caso resultante:
+                    if n_case == 0:
+                        print(" N = 0, se ha identificado un CASO LEVE.")
+                        print(" Buscando posibles recurrencias en otros patrones...")
+                        n1_case = p_selected.diagnosticar_lista_de_patrones()
+                        p_selected.caso_de_enfermedad = "leve"
+
+                        if n1_case == None:
+                            print(" N_1 = 0, no hay recurrencia en patrones distinto del inicial.")
+                        elif n1_case == 0:
+                            print(" N_1 = 0, no hay recurrencia en patrones distinto del inicial.*")
+                        elif n1_case == 1:
+                            print(" N_1 = 1, hay una recurrencia en patrones distinto del inicial.")
+                            print(" Se ha identificado un CASO MORTAL.")
+                            p_selected.caso_de_enfermedad = "mortal"
+                        elif n1_case > 1:
+                            print(" N_1 = " + str(n1_case) + ", hay una recurrencia en patrones distinto del inicial.")
+                            print(" Se ha identificado un CASO GRAVE.")
+                            p_selected.caso_de_enfermedad = "grave"
+                    elif n_case == 1: # Caso grave
+                        print(" N = 1, se ha identificado un CASO MORTAL.")
+                        p_selected.caso_de_enfermedad = "mortal"
+                    elif n_case > 1:
+                        print(" N = " + str(n_case) + ", se ha identificado un CASO GRAVE.")
+                        p_selected.caso_de_enfermedad = "mortal"
+
+                    print(" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+                    print(" Diagnóstico completo.")
+                    print("")
+                    break
                 elif p_option == total_patients + 1:
                     print("Diagnosticar todos")
                 elif p_option == total_patients + 2:
@@ -146,7 +198,7 @@ class Menu:
                 sin_pacientes = False
                 if lista != None:
                     if lista.first != None:
-                        print("---------------- Pacientes disponibles ----------------")
+                        print("     ¯¨'*•~-.¸¸,.-~*'[ Pacientes cargados en memoria ]¯¨'*•~-.¸¸,.-~*'")
                         todos = self.mostrar_pacientes_disponibles("b")
                     else:
                         sin_pacientes = True
@@ -155,55 +207,40 @@ class Menu:
                 if sin_pacientes:
                     print(" (!) No se encuentran pacientes disponibles actualmente.")
                     print("")
-            elif selected_option == 3:
-                print("Se leerán los datos del archivo cargado...")
-                if self.lector_obj.read_done:
-                    self.lector_obj.proces_file()
-                    Todos = self.mostrar_pacientes_disponibles("a")
-                    paciente_a_graficar = input()
-
-                    if paciente_a_graficar == "Todos":
-                        print("")
-                        #print("*** Se graficará la estructura del archivo de entrada.")
-                        #self.escritor_obj.writeDOT_T(self.lector_obj.lista_de_pacientes_procesados)                        
-                    else:
-                        paciente_a_graficar = self.lector_obj.lista_de_pacientes_procesados.buscar_por_nombre(paciente_a_graficar)
-                        print("")
-                        if paciente_a_graficar == None:
-                            print("(!) paciente no encontrado.")
-                            print("--- Regresando al menú principal...")
-                            print("")
-                        else:
-                            print("*** Se graficará el paciente: " + paciente_a_graficar.name)
-                            self.escritor_obj.writeDOT_G(paciente_a_graficar, False)
-                            print("")
-            elif selected_option == 4:
-                print("Se leerán los datos del archivo cargado...")
-                if self.lector_obj.read_done:
-                    self.lector_obj.proces_file()
-                    Todos = self.mostrar_pacientes_disponibles("a")
-                    paciente_a_graficar = input()
-
-                    if paciente_a_graficar == "Todos":
-                        print("")
-                        #print("*** Se graficará la estructura del archivo de entrada.")
-                        #self.escritor_obj.writeDOT_T(self.lector_obj.lista_de_pacientes_procesados)                        
-                    else:
-                        paciente_a_graficar = self.lector_obj.lista_de_pacientes_procesados.buscar_por_nombre(paciente_a_graficar)
-                        print("")
-                        if paciente_a_graficar == None:
-                            print("(!) paciente no encontrado.")
-                            print("--- Regresando al menú principal...")
-                            print("")
-                        else:
-                            print("*** Se graficará el paciente: " + paciente_a_graficar.name)
-                            self.escritor_obj.writeDOT_G(paciente_a_graficar, True)
-                            print("")
-
+            elif selected_option == 3:                
+                if self.lector_obj.procesed_data:
+                    print("     ¯¨'*•~-.¸¸,.-~*'[ Pacientes cargados en memoria ]¯¨'*•~-.¸¸,.-~*'")
+                    self.lector_obj.lista_de_pacientes_procesados.mostrar_pacientes()
                 else:
-                    print("No se ha cargado un archivo.")
+                    print("")
+                    print(" (!) No se encuentran pacientes disponibles actualmente.")
+                    print("")
+            elif selected_option == 4:
+                if self.lector_obj.procesed_data:
+                    print("")
+                    print(" Se realizará la escritura del archivo de salida en formato XML...")
+                    lista = self.lector_obj.lista_de_pacientes_procesados
+                    self.escritor_obj.write_out_XML(lista)
+                else:
+                    print("")
+                    print(" (!) No se encuentran pacientes disponibles actualmente.")
                     print("")
             elif selected_option == 5:
+                print("")
+                lista = self.lector_obj.lista_de_pacientes_procesados
+                sin_pacientes = False
+                if lista != None:
+                    if lista.first != None:
+                        print("     ¯¨'*•~-.¸¸,.-~*'[ Pacientes cargados en memoria ]¯¨'*•~-.¸¸,.-~*'")
+                        todos = self.mostrar_pacientes_disponibles("a")
+                    else:
+                        sin_pacientes = True
+                else:
+                    sin_pacientes = True
+                if sin_pacientes:
+                    print(" (!) No se encuentran pacientes disponibles actualmente.")
+                    print("")
+            elif selected_option == 6:
                 self.exit = True
                 print("")
                 print("Se cerrará el programa.")

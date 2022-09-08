@@ -20,12 +20,10 @@ class Lista_pacientes:
 
 	def mostrar_pacientes(self):
 		temp = self.first
-
-		print("-----------------------------------------")
+		
 		while temp != None:
-			temp.printself()
-			temp = temp.next
-			print("-----------------------------------------")
+			temp.imprimir_datos_de_paciente()
+			temp = temp.next			
 
 	def buscar_por_nombre(self, name):
 		r_paciente = None
@@ -46,9 +44,26 @@ class Lista_pacientes:
 			actual = actual.next
 		return actual
 
-	def diagnosticar_pacientes(self):
+	def diagnosticar_todos_los_pacientes(self):
 		t = self.first
 
 		while t != None:
-			t.diagnosticar()
+			n_case = t.diagnosticar(t.rejilla_inicial, True, True)
+
+			if n_case == 0:
+				n1_case = t.diagnosticar_lista_de_patrones()
+				t.caso_de_enfermedad = "leve"
+
+				if n1_case == None:
+					n1_case = 0
+					
+				if n1_case == 1:
+					t.caso_de_enfermedad = "mortal"
+				elif n1_case > 1:
+					t.caso_de_enfermedad = "grave"        
+			elif n_case == 1:
+				t.caso_de_enfermedad = "mortal"
+			elif n_case > 1:
+				t.caso_de_enfermedad = "mortal"
+
 			t = t.next

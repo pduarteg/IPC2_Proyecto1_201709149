@@ -10,7 +10,7 @@ class Nodo:
 	x = 0
 	y = 0
 
-	def __init__(self, arriba, abajo, izquierda, derecha, tipo, x, y):
+	def __init__(self, arriba, abajo, izquierda, derecha, x, y):
 		self.arriba = arriba
 		self.abajo = abajo
 		self.izquierda = izquierda
@@ -31,20 +31,39 @@ class Nodo:
 		else:
 			self.estado = True
 
-	def verificar_vecinos(self, cell):
+	def verificar_vecinos(self):
 		ady_inf = 0
 
-		if cell.derecha != None:
-			if cell.derecha.estado == True:
+		if self.derecha != None:
+			if self.derecha.estado == True:
 				ady_inf += 1
-		if cell.arriba != None:
-			if cell.arriba.estado == True:
+
+			if self.derecha.arriba != None:
+				if self.derecha.arriba.estado == True:
+					ady_inf += 1
+
+		if self.arriba != None:
+			if self.arriba.estado == True:
 				ady_inf += 1
-		if cell.izquierda != None:
-			if cell.izquierda.estado == True:
+
+			if self.arriba.izquierda != None:
+				if self.arriba.izquierda.estado == True:
+					ady_inf += 1
+
+		if self.izquierda != None:
+			if self.izquierda.estado == True:
 				ady_inf += 1
-		if cell.abajo != None:
-			if cell.abajo.estado == True:
+
+			if self.izquierda.abajo != None:
+				if self.izquierda.abajo.estado == True:
+					ady_inf += 1
+
+		if self.abajo != None:
+			if self.abajo.estado == True:
 				ady_inf += 1
+
+			if self.abajo.derecha != None:
+				if self.abajo.derecha.estado == True:
+					ady_inf += 1
 
 		return ady_inf
