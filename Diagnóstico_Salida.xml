@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pacientes>
+	<paciente>
+		<datospersonales>
+			<nombre>Denny</nombre>
+			<edad>24</edad>
+		</datospersonales>
+		<periodos>5</periodos>
+		<m>10</m>
+		<resultado>mortal</resultado>
+	</paciente>
+	<paciente>
+		<datospersonales>
+			<nombre>Mildred</nombre>
+			<edad>11</edad>
+		</datospersonales>
+		<periodos>15</periodos>
+		<m>10</m>
+		<resultado>leve</resultado>
+	</paciente>
+	<paciente>
+		<datospersonales>
+			<nombre>Abril</nombre>
+			<edad>17</edad>
+		</datospersonales>
+		<periodos>15</periodos>
+		<m>10</m>
+		<resultado>leve</resultado>
+	</paciente>
+</pacientes>
